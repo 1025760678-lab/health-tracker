@@ -26,6 +26,7 @@ import { BodyProfileCard } from "./BodyProfileCard";
 import { FoodEntryForm } from "./FoodEntryForm";
 import { MealLog } from "./MealLog";
 import { NutritionHistory } from "./NutritionHistory";
+import { RecipePlan } from "./RecipePlan";
 import { WeeklyOverview, type WeeklyOverviewDay } from "./WeeklyOverview";
 import { WeightTracker } from "./WeightTracker";
 
@@ -40,7 +41,7 @@ interface NutritionDashboardProps {
   onWeightRecordsChange: (records: WeightRecord[]) => void;
 }
 
-type NutritionView = "today" | "history" | "profile";
+type NutritionView = "today" | "recipes" | "history" | "profile";
 
 function formatEstimate(value: number | null) {
   return value === null ? "资料不完整" : `${Math.round(value).toLocaleString()} kcal`;
@@ -100,6 +101,7 @@ export function NutritionDashboard({
       <div className="nutrition-view-switcher glass-surface" role="tablist" aria-label="营养页面">
         {([
           ["today", "今日"],
+          ["recipes", "食谱"],
           ["history", "历史"],
           ["profile", "身体资料"],
         ] as const).map(([value, label]) => (
@@ -144,6 +146,8 @@ export function NutritionDashboard({
           />
         </div>
       )}
+
+      {view === "recipes" && <RecipePlan />}
 
       {view === "history" && (
         <div className="nutrition-history-layout" role="tabpanel" aria-label="营养历史">
