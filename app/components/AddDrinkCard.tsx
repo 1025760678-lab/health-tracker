@@ -3,15 +3,16 @@
 import { FormEvent, useState } from "react";
 import type { CoffeeType, DrinkEntry, DrinkType } from "../types/water";
 import { COFFEE_TYPE_NAMES } from "../types/water";
+import { DrinkIcon } from "./DrinkIcon";
 
 interface AddDrinkCardProps {
   onAdd: (entry: DrinkEntry) => void;
 }
 
-const drinkOptions: Array<{ type: DrinkType; label: string; icon: string }> = [
-  { type: "water", label: "水", icon: "●" },
-  { type: "milk", label: "牛奶", icon: "◒" },
-  { type: "coffee", label: "咖啡", icon: "◉" },
+const drinkOptions: Array<{ type: DrinkType; label: string }> = [
+  { type: "water", label: "水" },
+  { type: "milk", label: "牛奶" },
+  { type: "coffee", label: "咖啡" },
 ];
 
 const drinkNames: Record<DrinkType, string> = {
@@ -33,6 +34,7 @@ export function AddDrinkCard({ onAdd }: AddDrinkCardProps) {
   const [coffeeType, setCoffeeType] = useState<CoffeeType>("americano");
   const [customAmount, setCustomAmount] = useState("");
   const [calories, setCalories] = useState("");
+  const [caffeineMg, setCaffeineMg] = useState("");
   const [message, setMessage] = useState("");
 
   function addAmount(amount: number) {
@@ -41,12 +43,18 @@ export function AddDrinkCard({ onAdd }: AddDrinkCardProps) {
       setMessage("请输入 0 到 2,000 之间的咖啡热量");
       return;
     }
+    const caffeineValue = caffeineMg === "" ? undefined : Number(caffeineMg);
+    if (drinkType === "coffee" && caffeineValue !== undefined && (!Number.isInteger(caffeineValue) || caffeineValue < 0 || caffeineValue > 2000)) {
+      setMessage("请输入 0 到 2,000 之间的咖啡因毫克数");
+      return;
+    }
 
     onAdd({
       amount,
       drinkType,
       coffeeType: drinkType === "coffee" ? coffeeType : undefined,
       calories: drinkType === "coffee" ? calorieValue : undefined,
+      caffeineMg: drinkType === "coffee" ? caffeineValue : undefined,
     });
     setMessage(`已添加 ${amount} ml ${drinkNames[drinkType]}`);
     window.setTimeout(() => setMessage(""), 1800);
@@ -85,7 +93,7 @@ export function AddDrinkCard({ onAdd }: AddDrinkCardProps) {
               onClick={() => setDrinkType(option.type)}
               aria-pressed={drinkType === option.type}
             >
-              <span aria-hidden="true">{option.icon}</span>
+              <DrinkIcon type={option.type} />
               {option.label}
             </button>
           ))}
@@ -129,15 +137,32 @@ export function AddDrinkCard({ onAdd }: AddDrinkCardProps) {
             />
             <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-amber-700">千卡</span>
           </div>
+          <label className="mt-4 block text-xs font-bold text-amber-800" htmlFor="coffee-caffeine">咖啡因（mg，可选）</label>
+          <div className="relative mt-2">
+            <input
+              id="coffee-caffeine"
+              className="input-field border-amber-200 bg-white pr-16 focus:border-amber-400"
+              type="number"
+              inputMode="numeric"
+              min="0"
+              max="2000"
+              step="1"
+              placeholder="按包装标注填写"
+              value={caffeineMg}
+              onChange={(event) => setCaffeineMg(event.target.value)}
+            />
+            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-amber-700">mg</span>
+          </div>
+          <p className="water-field-hint">不同咖啡的咖啡因含量差异较大；不填写时不计入统计。</p>
         </div>
       )}
 
       <div className="quick-add-grid">
         <button className="quick-button quick-button-primary" type="button" onClick={() => addAmount(250)}>
-          <span className="text-2xl" aria-hidden="true">◒</span><span><strong>+250</strong> ml</span>
+          <DrinkIcon type={drinkType} /><span><strong>+250</strong> ml</span>
         </button>
         <button className="quick-button" type="button" onClick={() => addAmount(500)}>
-          <span className="text-2xl" aria-hidden="true">●</span><span><strong>+500</strong> ml</span>
+          <DrinkIcon type={drinkType} /><span><strong>+500</strong> ml</span>
         </button>
       </div>
 

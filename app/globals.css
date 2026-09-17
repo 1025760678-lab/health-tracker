@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "./workout.css";
 @import "./health.css";
+@import "./water.css";
 
 :root {
   color-scheme: light dark;

@@ -7,6 +7,7 @@ import { HistoryCard } from "./components/HistoryCard";
 import { NutritionDashboard } from "./components/nutrition/NutritionDashboard";
 import { ProgressCard } from "./components/ProgressCard";
 import { ReminderCard } from "./components/ReminderCard";
+import { TodayWaterInsights, WaterTrend } from "./components/WaterInsights";
 import { TodayDashboard, type HealthSection } from "./components/today/TodayDashboard";
 import { WorkoutDashboard } from "./components/workout/WorkoutDashboard";
 import type { NutritionData } from "./types/nutrition";
@@ -47,6 +48,7 @@ function getLocalDate(date = new Date()) {
 
 export default function Home() {
   const [activeTracker, setActiveTracker] = useState<HealthSection>("today");
+  const [waterView, setWaterView] = useState<"today" | "trend">("today");
   const [records, setRecords] = useState<WaterRecord[]>([]);
   const [dailyGoal, setDailyGoal] = useState(DEFAULT_DAILY_GOAL);
   const [workoutData, setWorkoutData] = useState<WorkoutData>(createInitialWorkoutData);
@@ -107,6 +109,12 @@ export default function Home() {
     saveWaterRecords(updatedRecords);
   }
 
+  function updateRecordCaffeine(id: string, caffeineMg: number) {
+    const updatedRecords = records.map((record) => record.id === id ? { ...record, caffeineMg } : record);
+    setRecords(updatedRecords);
+    saveWaterRecords(updatedRecords);
+  }
+
   function updateGoal(goal: number) {
     setDailyGoal(goal);
     saveDailyGoal(goal);
@@ -149,24 +157,37 @@ export default function Home() {
         )}
 
         {activeTracker === "water" && (
-          <div className="dashboard-grid tracker-view" role="tabpanel" aria-label="饮水记录">
-            <div className="primary-column" id="today">
-              <ProgressCard
-                total={isReady ? totalToday : 0}
-                goal={isReady ? dailyGoal : DEFAULT_DAILY_GOAL}
-                breakdown={isReady ? drinkBreakdown : { water: 0, milk: 0, coffee: 0 }}
-              />
-              <AddDrinkCard onAdd={addDrink} />
+          <div className="water-dashboard tracker-view" role="tabpanel" aria-label="饮水记录">
+            <div className="water-dashboard-header">
+              <div><p className="water-kicker">HYDRATION</p><h1>{waterView === "today" ? "今天" : "饮水趋势"}</h1></div>
+              <span>{new Intl.DateTimeFormat("zh-CN", { month: "long", day: "numeric", weekday: "long" }).format(new Date())}</span>
             </div>
-
-            <div className="history-column" id="history">
-              <HistoryCard records={todaysRecords} onDelete={deleteRecord} />
+            <div className="water-view-switcher" role="tablist" aria-label="饮水页面">
+              <button type="button" role="tab" aria-selected={waterView === "today"} data-active={waterView === "today"} onClick={() => setWaterView("today")}>今天</button>
+              <button type="button" role="tab" aria-selected={waterView === "trend"} data-active={waterView === "trend"} onClick={() => setWaterView("trend")}>趋势</button>
             </div>
+            {waterView === "today" ? (
+              <div className="dashboard-grid water-today-grid" role="tabpanel" aria-label="今日饮水">
+                <div className="primary-column" id="today">
+                  <ProgressCard
+                    total={isReady ? totalToday : 0}
+                    goal={isReady ? dailyGoal : DEFAULT_DAILY_GOAL}
+                    breakdown={isReady ? drinkBreakdown : { water: 0, milk: 0, coffee: 0 }}
+                  />
+                  <TodayWaterInsights records={records} today={today} />
+                  <AddDrinkCard onAdd={addDrink} />
+                </div>
 
-            <aside className="settings-surface glass-surface" id="settings" aria-label="设置">
-              <GoalCard key={dailyGoal} goal={dailyGoal} onSave={updateGoal} />
-              <ReminderCard />
-            </aside>
+                <div className="history-column" id="history">
+                  <HistoryCard records={todaysRecords} onDelete={deleteRecord} onUpdateCaffeine={updateRecordCaffeine} />
+                </div>
+
+                <aside className="settings-surface glass-surface" id="settings" aria-label="设置">
+                  <GoalCard key={dailyGoal} goal={dailyGoal} onSave={updateGoal} />
+                  <ReminderCard />
+                </aside>
+              </div>
+            ) : <div role="tabpanel" aria-label="饮水趋势"><WaterTrend records={records} today={today} goal={dailyGoal} /></div>}
           </div>
         )}
 

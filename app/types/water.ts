@@ -19,6 +19,8 @@ export interface DrinkEntry {
   drinkType: DrinkType;
   coffeeType?: CoffeeType;
   calories?: number;
+  /** Measured caffeine amount for this serving, when supplied by the user. */
+  caffeineMg?: number;
 }
 
 export interface WaterRecord extends DrinkEntry {
