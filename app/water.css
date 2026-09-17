@@ -32,7 +32,10 @@
 .water-view-switcher button { min-height: 3rem; border: 0; border-radius: .75rem; background: transparent; color: var(--water-muted); font-size: .95rem; font-weight: 750; }
 .water-view-switcher button[data-active="true"] { background: var(--glass-strong); color: var(--aqua-deep); box-shadow: inset 0 1px 0 var(--glass-line), 0 5px 16px rgba(31,78,88,.1); }
 
-.water-today-grid { gap: .9rem; }
+.water-today-grid { gap: .85rem; align-items: start; }
+.water-today-grid .primary-column,
+.water-today-grid .history-column { min-width: 0; align-content: start; gap: .85rem; }
+.water-today-grid .settings-surface { min-width: 0; }
 .water-dashboard .glass-surface,
 .water-dark-card { border: 1px solid var(--glass-line); background: linear-gradient(145deg, var(--glass-strong), var(--glass)); box-shadow: inset 0 1px 0 var(--glass-line), var(--shadow); backdrop-filter: blur(28px) saturate(150%); }
 .water-dashboard .hero-surface,
@@ -151,20 +154,16 @@
 .water-trend-footnote { margin: .1rem .2rem 0; color: var(--water-muted); font-size: .8rem; line-height: 1.5; }
 
 @media (min-width: 48rem) {
-  .water-insight-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .water-today-grid { grid-template-columns: minmax(0, 1fr); }
-  .water-today-grid .primary-column { grid-row: auto; }
-  .water-today-grid .history-column { grid-column: auto; grid-row: auto; }
-  .water-today-grid .settings-surface { grid-column: auto; }
+  .water-today-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .water-today-grid .primary-column,
+  .water-today-grid .history-column,
+  .water-today-grid .settings-surface { grid-column: auto; grid-row: auto; }
+  .water-insight-stack { grid-template-columns: minmax(0, 1fr); }
   .water-trend-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (min-width: 64rem) {
-  .water-today-grid { grid-template-columns: minmax(0, 1.12fr) minmax(19rem, .88fr); }
-  .water-today-grid .primary-column { grid-column: 1; grid-row: 1 / span 2; }
-  .water-today-grid .history-column { grid-column: 2; grid-row: 1; }
-  .water-today-grid .settings-surface { grid-column: 2; grid-row: 2; }
-  .water-insight-stack { grid-template-columns: 1fr; }
+  .water-today-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 }
 
 @media (max-width: 33rem) {

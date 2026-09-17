@@ -175,17 +175,16 @@ export default function Home() {
                     breakdown={isReady ? drinkBreakdown : { water: 0, milk: 0, coffee: 0 }}
                   />
                   <TodayWaterInsights records={records} today={today} />
-                  <AddDrinkCard onAdd={addDrink} />
                 </div>
 
                 <div className="history-column" id="history">
+                  <AddDrinkCard onAdd={addDrink} />
                   <HistoryCard records={todaysRecords} onDelete={deleteRecord} onUpdateCaffeine={updateRecordCaffeine} />
+                  <aside className="settings-surface glass-surface" id="settings" aria-label="设置">
+                    <GoalCard key={dailyGoal} goal={dailyGoal} onSave={updateGoal} />
+                    <ReminderCard />
+                  </aside>
                 </div>
-
-                <aside className="settings-surface glass-surface" id="settings" aria-label="设置">
-                  <GoalCard key={dailyGoal} goal={dailyGoal} onSave={updateGoal} />
-                  <ReminderCard />
-                </aside>
               </div>
             ) : <div role="tabpanel" aria-label="饮水趋势"><WaterTrend records={records} today={today} goal={dailyGoal} /></div>}
           </div>
