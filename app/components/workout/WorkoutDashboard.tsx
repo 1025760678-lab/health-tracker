@@ -1,6 +1,8 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useId, useMemo, useState } from "react";
+import { WheelNumberInput } from "../WheelNumberInput";
+import { WheelTimeInput } from "../WheelTimeInput";
 import type {
   Exercise,
   MuscleGroupId,
@@ -46,6 +48,9 @@ function getCurrentTime() {
 }
 
 function SessionEditor({ session, bodyWeightKg, onSave }: SessionEditorProps) {
+  const startId = useId();
+  const durationId = useId();
+  const caloriesId = useId();
   const [startTime, setStartTime] = useState(session?.startTime ?? getCurrentTime());
   const [duration, setDuration] = useState(session?.durationMinutes?.toString() ?? "");
   const [intensity, setIntensity] = useState<"light" | "moderate" | "vigorous">(
@@ -115,14 +120,14 @@ function SessionEditor({ session, bodyWeightKg, onSave }: SessionEditorProps) {
 
       <form onSubmit={handleSubmit}>
         <div className="workout-session-fields">
-          <label>
+          <label htmlFor={startId}>
             <span>开始时间</span>
-            <input type="time" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
+            <WheelTimeInput id={startId} value={startTime} onValueChange={setStartTime} label="训练开始时间" />
           </label>
-          <label>
+          <label htmlFor={durationId}>
             <span>时长</span>
             <span className="session-input-with-unit">
-              <input type="number" inputMode="numeric" min="1" max="1440" placeholder="60" value={duration} onChange={(event) => setDuration(event.target.value)} />
+              <WheelNumberInput id={durationId} inputMode="numeric" min={1} max={1440} placeholder="60" value={duration} onValueChange={setDuration} wheelLabel="训练时长" unit="分钟" />
               <small>分钟</small>
             </span>
           </label>
@@ -145,10 +150,10 @@ function SessionEditor({ session, bodyWeightKg, onSave }: SessionEditorProps) {
             <strong>{automaticEstimate === null ? "资料不完整" : `约 ${automaticEstimate.toLocaleString()} 千卡`}</strong>
             <small>{bodyWeightKg ? `按当前体重 ${bodyWeightKg} kg、时长和强度估算` : "请先在身体档案中填写体重"}</small>
           </div>
-          <label>
+          <label htmlFor={caloriesId}>
             <span>手动覆盖</span>
             <span className="session-input-with-unit">
-              <input type="number" inputMode="numeric" min="0" max="5000" placeholder="可选" value={manualCalories} onChange={(event) => setManualCalories(event.target.value)} />
+              <WheelNumberInput id={caloriesId} inputMode="numeric" min={0} max={5000} placeholder="可选" value={manualCalories} onValueChange={setManualCalories} wheelLabel="手动消耗" unit="千卡" />
               <small>千卡</small>
             </span>
           </label>

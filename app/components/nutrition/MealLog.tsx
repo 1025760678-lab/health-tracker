@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
+import { WheelNumberInput } from "../WheelNumberInput";
 import {
   MEAL_LABELS,
   type FoodEntry,
@@ -94,15 +95,16 @@ function FoodEntryRow({ entry, onUpdate, onDelete }: FoodEntryRowProps) {
         </label>
         <label className="nutrition-field" htmlFor={calorieId}>
           <span>热量（kcal）</span>
-          <input
+          <WheelNumberInput
             id={calorieId}
             className="nutrition-input"
-            type="number"
             inputMode="numeric"
-            min="1"
-            step="1"
+            min={1}
+            max={5000}
+            wheelLabel="食物热量"
+            unit="kcal"
             value={calories}
-            onChange={(event) => setCalories(event.target.value)}
+            onValueChange={setCalories}
             required
           />
         </label>

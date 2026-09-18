@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useId, useState } from "react";
+import { WheelNumberInput } from "../WheelNumberInput";
 
 interface AddSetFormProps {
   defaultWeight?: number;
@@ -8,6 +9,8 @@ interface AddSetFormProps {
 }
 
 export function AddSetForm({ defaultWeight, onAdd }: AddSetFormProps) {
+  const weightId = useId();
+  const repsId = useId();
   const [weight, setWeight] = useState(
     defaultWeight === undefined ? "" : String(defaultWeight),
   );
@@ -40,18 +43,21 @@ export function AddSetForm({ defaultWeight, onAdd }: AddSetFormProps) {
   return (
     <form className="add-set-form" onSubmit={handleSubmit}>
       <div className="add-set-fields">
-        <label className="add-set-field">
+        <label className="add-set-field" htmlFor={weightId}>
           <span>重量</span>
           <span className="add-set-input-shell">
-            <input
-              type="number"
+            <WheelNumberInput
+              id={weightId}
               inputMode="decimal"
-              min="0"
-              step="0.5"
+              min={0}
+              max={1000}
+              step={0.5}
+              wheelLabel="新一组重量"
+              unit="kg"
               placeholder="0"
               value={weight}
-              onChange={(event) => {
-                setWeight(event.target.value);
+              onValueChange={(value) => {
+                setWeight(value);
                 setMessage("");
               }}
               aria-label="新一组重量，千克"
@@ -64,18 +70,20 @@ export function AddSetForm({ defaultWeight, onAdd }: AddSetFormProps) {
           ×
         </span>
 
-        <label className="add-set-field">
+        <label className="add-set-field" htmlFor={repsId}>
           <span>次数</span>
           <span className="add-set-input-shell">
-            <input
-              type="number"
+            <WheelNumberInput
+              id={repsId}
               inputMode="numeric"
-              min="1"
-              step="1"
+              min={1}
+              max={1000}
+              wheelLabel="新一组次数"
+              unit="次"
               placeholder="0"
               value={reps}
-              onChange={(event) => {
-                setReps(event.target.value);
+              onValueChange={(value) => {
+                setReps(value);
                 setMessage("");
               }}
               aria-label="新一组重复次数"

@@ -147,7 +147,7 @@ export function NutritionDashboard({
         </div>
       )}
 
-      {view === "recipes" && <RecipePlan />}
+      {view === "recipes" && <RecipePlan profile={profile} weightRecords={weightRecords} onOpenProfile={() => setView("profile")} />}
 
       {view === "history" && (
         <div className="nutrition-history-layout" role="tabpanel" aria-label="营养历史">

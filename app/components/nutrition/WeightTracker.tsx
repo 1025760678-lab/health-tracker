@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState, type CSSProperties, type FormEvent } from "react";
+import { WheelNumberInput } from "../WheelNumberInput";
 import type { WeightRecord } from "../../types/profile";
 
 export interface WeightTrackerProps {
@@ -119,17 +120,18 @@ export function WeightTracker({ records, onAdd, onDelete }: WeightTrackerProps) 
         <label className="nutrition-field" htmlFor={weightId}>
           <span>体重</span>
           <span className="nutrition-number-input">
-            <input
+            <WheelNumberInput
               id={weightId}
               className="nutrition-input"
-              type="number"
               inputMode="decimal"
-              min="20"
-              max="500"
-              step="0.1"
+              min={20}
+              max={500}
+              step={0.1}
+              wheelLabel="体重"
+              unit="kg"
               value={weight}
               placeholder="0.0"
-              onChange={(event) => setWeight(event.target.value)}
+              onValueChange={setWeight}
               required
             />
             <small>kg</small>

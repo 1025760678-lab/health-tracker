@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
+import { WheelNumberInput } from "../WheelNumberInput";
 import type {
   BaselineActivityLevel,
   BiologicalSex,
@@ -83,17 +84,17 @@ function BodyProfileEditor({ profile, onSave }: BodyProfileCardProps) {
         <label className="nutrition-field" htmlFor={ageId}>
           <span>年龄</span>
           <span className="nutrition-number-input">
-            <input
+            <WheelNumberInput
               id={ageId}
               className="nutrition-input"
-              type="number"
               inputMode="numeric"
-              min="13"
-              max="120"
-              step="1"
+              min={13}
+              max={120}
+              wheelLabel="年龄"
+              unit="岁"
               value={draft.age ?? ""}
               placeholder="岁"
-              onChange={(event) => updateNumber("age", event.target.value)}
+              onValueChange={(value) => updateNumber("age", value)}
             />
             <small>岁</small>
           </span>
@@ -101,17 +102,18 @@ function BodyProfileEditor({ profile, onSave }: BodyProfileCardProps) {
         <label className="nutrition-field" htmlFor={heightId}>
           <span>身高</span>
           <span className="nutrition-number-input">
-            <input
+            <WheelNumberInput
               id={heightId}
               className="nutrition-input"
-              type="number"
               inputMode="decimal"
-              min="80"
-              max="250"
-              step="0.1"
+              min={80}
+              max={250}
+              step={0.1}
+              wheelLabel="身高"
+              unit="cm"
               value={draft.heightCm ?? ""}
               placeholder="0"
-              onChange={(event) => updateNumber("heightCm", event.target.value)}
+              onValueChange={(value) => updateNumber("heightCm", value)}
             />
             <small>cm</small>
           </span>
@@ -119,17 +121,18 @@ function BodyProfileEditor({ profile, onSave }: BodyProfileCardProps) {
         <label className="nutrition-field" htmlFor={weightId}>
           <span>当前体重</span>
           <span className="nutrition-number-input">
-            <input
+            <WheelNumberInput
               id={weightId}
               className="nutrition-input"
-              type="number"
               inputMode="decimal"
-              min="20"
-              max="500"
-              step="0.1"
+              min={20}
+              max={500}
+              step={0.1}
+              wheelLabel="当前体重"
+              unit="kg"
               value={draft.currentWeightKg ?? ""}
               placeholder="0"
-              onChange={(event) => updateNumber("currentWeightKg", event.target.value)}
+              onValueChange={(value) => updateNumber("currentWeightKg", value)}
             />
             <small>kg</small>
           </span>
@@ -183,16 +186,18 @@ function BodyProfileEditor({ profile, onSave }: BodyProfileCardProps) {
         <label className="nutrition-field profile-goal-value" htmlFor={goalValueId}>
           <span>{goalValueLabel}</span>
           <span className="nutrition-number-input">
-            <input
+            <WheelNumberInput
               id={goalValueId}
               className="nutrition-input"
-              type="number"
               inputMode="numeric"
-              min="0"
-              step="10"
+              min={0}
+              max={draft.calorieGoalType === "custom" ? 10000 : 3000}
+              step={10}
+              wheelLabel={goalValueLabel}
+              unit="kcal"
               value={draft.calorieGoalValue ?? ""}
               placeholder={draft.calorieGoalType === "custom" ? "例如 2000" : "例如 300"}
-              onChange={(event) => updateNumber("calorieGoalValue", event.target.value)}
+              onValueChange={(value) => updateNumber("calorieGoalValue", value)}
             />
             <small>kcal</small>
           </span>

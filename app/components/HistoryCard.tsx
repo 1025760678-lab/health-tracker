@@ -1,6 +1,7 @@
 import type { WaterRecord } from "../types/water";
 import { COFFEE_TYPE_NAMES } from "../types/water";
 import { DrinkIcon } from "./DrinkIcon";
+import { WheelNumberInput } from "./WheelNumberInput";
 import { useState, type FormEvent } from "react";
 
 interface HistoryCardProps {
@@ -76,7 +77,7 @@ export function HistoryCard({ records, onDelete, onUpdateCaffeine }: HistoryCard
                   {editingId === record.id && (
                     <form className="water-caffeine-edit" onSubmit={(event) => saveCaffeine(event, record.id)}>
                       <label htmlFor={`caffeine-${record.id}`}>咖啡因 mg</label>
-                      <input id={`caffeine-${record.id}`} type="number" inputMode="numeric" min="0" max="2000" step="1" value={draftCaffeine} onChange={(event) => setDraftCaffeine(event.target.value)} autoFocus />
+                      <WheelNumberInput id={`caffeine-${record.id}`} inputMode="numeric" min={0} max={2000} value={draftCaffeine} onValueChange={setDraftCaffeine} wheelLabel="咖啡因" unit="mg" />
                       <button type="submit">保存</button>
                       <button type="button" onClick={() => setEditingId(null)}>取消</button>
                     </form>

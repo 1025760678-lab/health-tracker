@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { WheelNumberInput } from "./WheelNumberInput";
 
 interface GoalCardProps {
   goal: number;
@@ -39,15 +40,16 @@ export function GoalCard({ goal, onSave }: GoalCardProps) {
       {isEditing && (
         <form className="mt-5 flex gap-3 border-t border-slate-100 pt-5" onSubmit={handleSubmit}>
           <label className="sr-only" htmlFor="daily-goal">每日饮水目标（毫升）</label>
-          <input
+          <WheelNumberInput
             id="daily-goal"
             className="input-field min-w-0 flex-1"
-            type="number"
-            min="250"
-            max="10000"
-            step="50"
+            min={250}
+            max={10000}
+            step={50}
+            wheelLabel="每日饮水目标"
+            unit="ml"
             value={draftGoal}
-            onChange={(event) => setDraftGoal(event.target.value)}
+            onValueChange={setDraftGoal}
           />
           <button className="primary-button" type="submit">保存</button>
         </form>

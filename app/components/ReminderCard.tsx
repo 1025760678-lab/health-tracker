@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useId, useMemo, useState } from "react";
+import { WheelTimeInput } from "./WheelTimeInput";
 import type { ReminderSettings } from "../types/reminder";
 import {
   DEFAULT_REMINDER_SETTINGS,
@@ -43,6 +44,8 @@ function showReminder() {
 }
 
 export function ReminderCard() {
+  const startId = useId();
+  const endId = useId();
   const [settings, setSettings] = useState<ReminderSettings>(DEFAULT_REMINDER_SETTINGS);
   const [draftInterval, setDraftInterval] = useState("60");
   const [draftStart, setDraftStart] = useState("08:00");
@@ -184,13 +187,13 @@ export function ReminderCard() {
         </select>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <label className="text-xs font-bold text-slate-500">
+          <label className="text-xs font-bold text-slate-500" htmlFor={startId}>
             开始时间
-            <input className="input-field mt-2" type="time" value={draftStart} onChange={(event) => setDraftStart(event.target.value)} />
+            <WheelTimeInput id={startId} className="mt-2" value={draftStart} onValueChange={setDraftStart} label="开始时间" />
           </label>
-          <label className="text-xs font-bold text-slate-500">
+          <label className="text-xs font-bold text-slate-500" htmlFor={endId}>
             结束时间
-            <input className="input-field mt-2" type="time" value={draftEnd} onChange={(event) => setDraftEnd(event.target.value)} />
+            <WheelTimeInput id={endId} className="mt-2" value={draftEnd} onValueChange={setDraftEnd} label="结束时间" />
           </label>
         </div>
 

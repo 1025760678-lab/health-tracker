@@ -556,6 +556,273 @@
   gap: 0.9rem;
 }
 
+.recipe-planner,
+.recipe-stage-section,
+.recipe-protein-picker {
+  border-radius: var(--health-radius);
+  padding: 1.15rem;
+}
+
+.recipe-planner,
+.recipe-stage-section {
+  background: linear-gradient(145deg, var(--health-surface-strong), var(--health-surface));
+}
+
+.recipe-link-button {
+  min-height: 2.75rem;
+  border: 1px solid var(--health-line);
+  border-radius: 0.9rem;
+  background: var(--health-green-soft);
+  padding: 0 0.75rem;
+  color: var(--health-green-deep);
+  font-size: 0.84rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.recipe-option-group,
+.recipe-sex-options {
+  min-width: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.recipe-option-group legend,
+.recipe-sex-options legend {
+  margin-bottom: 0.55rem;
+  color: var(--foreground);
+  font-size: 0.88rem;
+  font-weight: 740;
+}
+
+.recipe-option-row,
+.recipe-inline-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.recipe-option-row .recipe-choice {
+  flex: 1 1 8rem;
+}
+
+.recipe-choice,
+.recipe-small-choice,
+.recipe-stage-choice {
+  border: 1px solid var(--health-line);
+  border-radius: 1rem;
+  background: var(--health-field);
+  color: var(--foreground);
+  text-align: left;
+  transition: 180ms ease;
+}
+
+.recipe-choice {
+  display: grid;
+  align-content: center;
+  min-height: 4.5rem;
+  gap: 0.25rem;
+  padding: 0.7rem 0.9rem;
+}
+
+.recipe-choice strong {
+  font-size: 1rem;
+}
+
+.recipe-choice small,
+.recipe-stage-choice small,
+.recipe-option-hint {
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.recipe-choice[data-active="true"],
+.recipe-small-choice[data-active="true"],
+.recipe-stage-choice[data-active="true"] {
+  border-color: var(--health-green);
+  background: var(--health-green-soft);
+  box-shadow: inset 0 1px 0 var(--glass-line);
+  color: var(--health-green-deep);
+}
+
+.recipe-input-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 0.8rem;
+  margin-top: 1.15rem;
+}
+
+.recipe-input-grid .nutrition-field,
+.recipe-input-grid .recipe-sex-options {
+  min-width: 0;
+}
+
+.recipe-input-grid .nutrition-field > span:first-child {
+  min-height: 1.6rem;
+}
+
+.recipe-small-choice {
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.86rem;
+  font-weight: 720;
+  text-align: center;
+}
+
+.recipe-preference-grid {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.1rem;
+  border-top: 1px solid var(--health-line);
+  padding-top: 1rem;
+}
+
+.recipe-option-hint {
+  display: block;
+  margin-top: 0.45rem;
+}
+
+.recipe-planner-note,
+.recipe-stage-note {
+  margin: 0.85rem 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.recipe-validation {
+  margin: 0.75rem 0 0;
+  color: #ab3d4f;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.recipe-stage-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.recipe-stage-choice {
+  display: grid;
+  align-content: center;
+  gap: 0.18rem;
+  min-width: 0;
+  min-height: 5.65rem;
+  padding: 0.65rem;
+}
+
+.recipe-stage-choice span {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.recipe-stage-choice strong {
+  font-size: 1.13rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.recipe-stage-choice small {
+  overflow-wrap: anywhere;
+}
+
+.recipe-target-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+
+.recipe-target-metrics > div {
+  display: grid;
+  align-content: center;
+  gap: 0.18rem;
+  min-width: 0;
+  min-height: 5.1rem;
+  border: 1px solid var(--health-line);
+  border-radius: 1rem;
+  background: var(--health-field);
+  padding: 0.65rem;
+}
+
+.recipe-target-metrics .recipe-target-highlight {
+  border-color: rgba(75, 183, 136, 0.32);
+  background: var(--health-green-soft);
+}
+
+.recipe-target-metrics span,
+.recipe-target-metrics small {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.recipe-target-metrics strong {
+  color: var(--foreground);
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.recipe-target-highlight strong {
+  color: var(--health-green-deep);
+}
+
+.recipe-empty-estimate {
+  border: 1px dashed var(--health-line);
+  border-radius: 1rem;
+  padding: 1.3rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.recipe-method {
+  margin-top: 0.9rem;
+  border-top: 1px solid var(--health-line);
+  padding-top: 0.75rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.recipe-method summary {
+  width: fit-content;
+  color: var(--health-green-deep);
+  font-size: 0.88rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.recipe-method summary:focus-visible {
+  outline: 3px solid rgba(75, 183, 136, 0.25);
+  outline-offset: 3px;
+}
+
+.recipe-method p {
+  margin: 0.55rem 0 0;
+}
+
+.recipe-method a {
+  color: var(--health-green-deep);
+  text-underline-offset: 0.2em;
+}
+
+.recipe-protein-picker {
+  margin: 0.7rem 0;
+  padding: 0.8rem 1rem;
+}
+
+.recipe-protein-picker legend {
+  padding: 0 0.3rem;
+  color: var(--foreground);
+  font-size: 0.88rem;
+  font-weight: 740;
+}
+
 .recipe-summary,
 .recipe-cooking-note {
   border-radius: var(--health-radius);
@@ -1923,6 +2190,23 @@
 /* Tablet and desktop composition */
 
 @media (min-width: 48rem) {
+  .recipe-preference-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .recipe-input-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .recipe-table {
+    min-width: 0;
+  }
+
+  .recipe-table th,
+  .recipe-table td {
+    padding-inline: 0.28rem;
+  }
+
   .today-dashboard,
   .nutrition-dashboard {
     gap: 1.1rem;

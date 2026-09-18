@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
+import { WheelNumberInput } from "../WheelNumberInput";
 import type { WorkoutSet } from "../../types/workout";
 
 interface SetRowProps {
@@ -10,6 +11,8 @@ interface SetRowProps {
 }
 
 export function SetRow({ set, onChange, onDelete }: SetRowProps) {
+  const weightId = useId();
+  const repsId = useId();
   const [weightDraft, setWeightDraft] = useState(String(set.weight));
   const [repsDraft, setRepsDraft] = useState(String(set.reps));
 
@@ -36,16 +39,19 @@ export function SetRow({ set, onChange, onDelete }: SetRowProps) {
         <strong>{set.setNumber}</strong>
       </div>
 
-      <label className="set-input-group">
+      <label className="set-input-group" htmlFor={weightId}>
         <span>重量</span>
         <span className="set-input-shell">
-          <input
-            type="number"
+          <WheelNumberInput
+            id={weightId}
             inputMode="decimal"
-            min="0"
-            step="0.5"
+            min={0}
+            max={1000}
+            step={0.5}
+            wheelLabel={`第 ${set.setNumber} 组重量`}
+            unit="kg"
             value={weightDraft}
-            onChange={(event) => updateWeight(event.target.value)}
+            onValueChange={updateWeight}
             onBlur={() => setWeightDraft(String(set.weight))}
             aria-label={`第 ${set.setNumber} 组重量，千克`}
           />
@@ -53,16 +59,18 @@ export function SetRow({ set, onChange, onDelete }: SetRowProps) {
         </span>
       </label>
 
-      <label className="set-input-group">
+      <label className="set-input-group" htmlFor={repsId}>
         <span>次数</span>
         <span className="set-input-shell">
-          <input
-            type="number"
+          <WheelNumberInput
+            id={repsId}
             inputMode="numeric"
-            min="1"
-            step="1"
+            min={1}
+            max={1000}
+            wheelLabel={`第 ${set.setNumber} 组次数`}
+            unit="次"
             value={repsDraft}
-            onChange={(event) => updateReps(event.target.value)}
+            onValueChange={updateReps}
             onBlur={() => setRepsDraft(String(set.reps))}
             aria-label={`第 ${set.setNumber} 组重复次数`}
           />

@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import type { CoffeeType, DrinkEntry, DrinkType } from "../types/water";
 import { COFFEE_TYPE_NAMES } from "../types/water";
 import { DrinkIcon } from "./DrinkIcon";
+import { WheelNumberInput } from "./WheelNumberInput";
 
 interface AddDrinkCardProps {
   onAdd: (entry: DrinkEntry) => void;
@@ -123,33 +124,33 @@ export function AddDrinkCard({ onAdd }: AddDrinkCardProps) {
 
           <label className="mt-4 block text-xs font-bold text-amber-800" htmlFor="coffee-calories">热量</label>
           <div className="relative mt-2">
-            <input
+            <WheelNumberInput
               id="coffee-calories"
               className="input-field border-amber-200 bg-white pr-16 focus:border-amber-400"
-              type="number"
               inputMode="numeric"
-              min="0"
-              max="2000"
-              step="1"
+              min={0}
+              max={2000}
+              wheelLabel="咖啡热量"
+              unit="千卡"
               placeholder="输入热量"
               value={calories}
-              onChange={(event) => setCalories(event.target.value)}
+              onValueChange={setCalories}
             />
             <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-amber-700">千卡</span>
           </div>
           <label className="mt-4 block text-xs font-bold text-amber-800" htmlFor="coffee-caffeine">咖啡因（mg，可选）</label>
           <div className="relative mt-2">
-            <input
+            <WheelNumberInput
               id="coffee-caffeine"
               className="input-field border-amber-200 bg-white pr-16 focus:border-amber-400"
-              type="number"
               inputMode="numeric"
-              min="0"
-              max="2000"
-              step="1"
+              min={0}
+              max={2000}
+              wheelLabel="咖啡因"
+              unit="mg"
               placeholder="按包装标注填写"
               value={caffeineMg}
-              onChange={(event) => setCaffeineMg(event.target.value)}
+              onValueChange={setCaffeineMg}
             />
             <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-amber-700">mg</span>
           </div>
@@ -169,17 +170,17 @@ export function AddDrinkCard({ onAdd }: AddDrinkCardProps) {
       <form className="mt-4 flex gap-3" onSubmit={handleSubmit}>
         <label className="sr-only" htmlFor="custom-amount">自定义饮品容量（毫升）</label>
         <div className="relative min-w-0 flex-1">
-          <input
+          <WheelNumberInput
             id="custom-amount"
             className="input-field pr-12"
-            type="number"
             inputMode="numeric"
-            min="1"
-            max="10000"
-            step="1"
+            min={1}
+            max={10000}
+            wheelLabel="饮品容量"
+            unit="ml"
             placeholder="自定义容量"
             value={customAmount}
-            onChange={(event) => setCustomAmount(event.target.value)}
+            onValueChange={setCustomAmount}
           />
           <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-400">ml</span>
         </div>
