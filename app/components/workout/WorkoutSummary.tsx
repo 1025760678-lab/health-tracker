@@ -44,6 +44,10 @@ export function WorkoutSummary({
     (sum, set) => sum + set.weight * set.reps,
     0,
   );
+  const plannedSets = sessionExercises.reduce((total, item) => {
+    const completed = sessionSets.filter((set) => set.workoutExerciseId === item.id).length;
+    return total + Math.max(completed, item.targetSets ?? 4);
+  }, 0);
   const sessionDetails = session
     ? [
         session.startTime ? `${session.startTime} 开始` : null,
@@ -112,6 +116,15 @@ export function WorkoutSummary({
           </dd>
         </div>
       </dl>
+
+      {plannedSets > 0 && (
+        <div className="workout-overall-progress">
+          <div><strong>今日组数进度</strong><span>{sessionSets.length} / {plannedSets} 组</span></div>
+          <div className="workout-overall-track" role="progressbar" aria-label="今日训练组数进度" aria-valuemin={0} aria-valuemax={plannedSets} aria-valuenow={sessionSets.length}>
+            <span style={{ width: `${Math.min(100, sessionSets.length / plannedSets * 100)}%` }} />
+          </div>
+        </div>
+      )}
 
       {groupTotals.length > 0 ? (
         <ul className="workout-summary-groups" aria-label="各肌群训练统计">

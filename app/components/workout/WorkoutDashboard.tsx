@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useId, useMemo, useState } from "react";
+import { FormEvent, useEffect, useId, useMemo, useState } from "react";
 import { WheelNumberInput } from "../WheelNumberInput";
 import { WheelTimeInput } from "../WheelTimeInput";
 import type {
@@ -24,8 +24,10 @@ import { ExerciseList } from "./ExerciseList";
 import { ExerciseTracker } from "./ExerciseTracker";
 import { MuscleGroupSelector } from "./MuscleGroupSelector";
 import { PersonalBest } from "./PersonalBest";
+import { RestTimer } from "./RestTimer";
 import { TodaysWorkout } from "./TodaysWorkout";
 import { WorkoutHistory } from "./WorkoutHistory";
+import { WorkoutSessionControl } from "./WorkoutSessionControl";
 import { WorkoutSummary } from "./WorkoutSummary";
 
 interface WorkoutDashboardProps {
@@ -174,6 +176,15 @@ export function WorkoutDashboard({ data, bodyWeightKg, onChange }: WorkoutDashbo
   const [view, setView] = useState<WorkoutView>("today");
   const [selectedGroup, setSelectedGroup] = useState<MuscleGroupId>("chest");
   const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(null);
+  const [restDuration, setRestDuration] = useState(60);
+  const [restEndAt, setRestEndAt] = useState<number | null>(null);
+  const [restPausedRemaining, setRestPausedRemaining] = useState<number | null>(null);
+  const [restNow, setRestNow] = useState(() => Date.now());
+  const [restFinished, setRestFinished] = useState(false);
+  const [workoutStartedAt, setWorkoutStartedAt] = useState<number | null>(null);
+  const [workoutPausedAt, setWorkoutPausedAt] = useState<number | null>(null);
+  const [workoutPausedMs, setWorkoutPausedMs] = useState(0);
+  const [workoutNow, setWorkoutNow] = useState(() => Date.now());
   const today = getLocalDateKey();
   const todaySession = findWorkoutSessionByDate(data, today) ?? null;
 
@@ -202,6 +213,138 @@ export function WorkoutDashboard({ data, bodyWeightKg, onChange }: WorkoutDashbo
     ? getPreviousWorkoutPerformance(data, selectedExercise.id, today)?.sets ?? []
     : [];
   const personalBest = selectedExercise ? getPersonalBest(data, selectedExercise.id) : null;
+  const restRemaining = restEndAt === null ? 0 : Math.max(0, Math.ceil((restEndAt - restNow) / 1000));
+  const displayedRestRemaining = restPausedRemaining ?? restRemaining;
+  const workoutElapsedSeconds = workoutStartedAt === null ? 0 : Math.max(0, Math.floor(((workoutPausedAt ?? workoutNow) - workoutStartedAt - workoutPausedMs) / 1000));
+
+  useEffect(() => {
+    try {
+      const storedDuration = Number(window.localStorage.getItem("workoutTracker_restDuration"));
+      if ([45, 60, 90, 120].includes(storedDuration)) {
+        // Restore the user's timer preference after hydration.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setRestDuration(storedDuration);
+      }
+      const saved = JSON.parse(window.localStorage.getItem("workoutTracker_restTimer") ?? "null") as { date?: string; endAt?: number } | null;
+      if (saved?.date === today && typeof saved.endAt === "number" && saved.endAt > Date.now()) {
+        setRestEndAt(saved.endAt);
+      }
+      const activeWorkout = JSON.parse(window.localStorage.getItem("workoutTracker_activeSession") ?? "null") as { date?: string; startedAt?: number; pausedAt?: number | null; pausedMs?: number } | null;
+      if (activeWorkout?.date === today && typeof activeWorkout.startedAt === "number") {
+        setWorkoutStartedAt(activeWorkout.startedAt);
+        setWorkoutPausedAt(typeof activeWorkout.pausedAt === "number" ? activeWorkout.pausedAt : null);
+        setWorkoutPausedMs(typeof activeWorkout.pausedMs === "number" ? activeWorkout.pausedMs : 0);
+      }
+    } catch { /* Storage may be unavailable in private browsing. */ }
+  }, [today]);
+
+  useEffect(() => {
+    if (restEndAt === null) return;
+    const timer = window.setInterval(() => {
+      const now = Date.now();
+      setRestNow(now);
+      if (now >= restEndAt) {
+        setRestEndAt(null);
+        setRestFinished(true);
+        try { window.localStorage.removeItem("workoutTracker_restTimer"); } catch { /* optional persistence */ }
+      }
+    }, 250);
+    return () => window.clearInterval(timer);
+  }, [restEndAt]);
+
+  useEffect(() => {
+    if (workoutStartedAt === null || workoutPausedAt !== null) return;
+    const timer = window.setInterval(() => setWorkoutNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, [workoutStartedAt, workoutPausedAt]);
+
+  function persistWorkoutTimer(startedAt: number, pausedAt: number | null, pausedMs: number) {
+    try { window.localStorage.setItem("workoutTracker_activeSession", JSON.stringify({ date: today, startedAt, pausedAt, pausedMs })); } catch { /* optional persistence */ }
+  }
+
+  function activateWorkoutTimer() {
+    if (workoutStartedAt !== null) return;
+    const startedAt = Date.now();
+    setWorkoutStartedAt(startedAt);
+    setWorkoutPausedAt(null);
+    setWorkoutPausedMs(0);
+    setWorkoutNow(startedAt);
+    persistWorkoutTimer(startedAt, null, 0);
+  }
+
+  function startWorkout() {
+    activateWorkoutTimer();
+    const ensured = ensureTodaySession(data);
+    commit(ensured.data);
+  }
+
+  function pauseWorkout() {
+    if (workoutStartedAt === null || workoutPausedAt !== null) return;
+    const pausedAt = Date.now();
+    setWorkoutPausedAt(pausedAt);
+    persistWorkoutTimer(workoutStartedAt, pausedAt, workoutPausedMs);
+  }
+
+  function resumeWorkout() {
+    if (workoutStartedAt === null || workoutPausedAt === null) return;
+    const pausedMs = workoutPausedMs + Date.now() - workoutPausedAt;
+    setWorkoutPausedMs(pausedMs);
+    setWorkoutPausedAt(null);
+    setWorkoutNow(Date.now());
+    persistWorkoutTimer(workoutStartedAt, null, pausedMs);
+  }
+
+  function finishWorkout() {
+    if (workoutStartedAt === null) return;
+    saveSession({ durationMinutes: Math.max(1, Math.round(workoutElapsedSeconds / 60)) });
+    setWorkoutStartedAt(null);
+    setWorkoutPausedAt(null);
+    setWorkoutPausedMs(0);
+    stopRest();
+    try { window.localStorage.removeItem("workoutTracker_activeSession"); } catch { /* optional persistence */ }
+  }
+
+  function startRest(seconds = restDuration) {
+    const endAt = Date.now() + seconds * 1000;
+    setRestEndAt(endAt);
+    setRestNow(Date.now());
+    setRestFinished(false);
+    setRestPausedRemaining(null);
+    try { window.localStorage.setItem("workoutTracker_restTimer", JSON.stringify({ date: today, endAt })); } catch { /* optional persistence */ }
+  }
+
+  function stopRest() {
+    setRestEndAt(null);
+    setRestFinished(false);
+    setRestPausedRemaining(null);
+    try { window.localStorage.removeItem("workoutTracker_restTimer"); } catch { /* optional persistence */ }
+  }
+
+  function pauseRest() {
+    if (restEndAt === null) return;
+    const remaining = Math.max(1, Math.ceil((restEndAt - Date.now()) / 1000));
+    setRestPausedRemaining(remaining);
+    setRestEndAt(null);
+    try { window.localStorage.removeItem("workoutTracker_restTimer"); } catch { /* optional persistence */ }
+  }
+
+  function resumeRest() {
+    if (restPausedRemaining === null) return;
+    startRest(restPausedRemaining);
+  }
+
+  function addRestTime() {
+    if (restPausedRemaining !== null) {
+      setRestPausedRemaining(restPausedRemaining + 15);
+      return;
+    }
+    startRest(restRemaining + 15);
+  }
+
+  function chooseRestDuration(seconds: number) {
+    setRestDuration(seconds);
+    try { window.localStorage.setItem("workoutTracker_restDuration", String(seconds)); } catch { /* optional persistence */ }
+  }
 
   function commit(nextData: WorkoutData) {
     onChange(nextData);
@@ -242,6 +385,7 @@ export function WorkoutDashboard({ data, bodyWeightKg, onChange }: WorkoutDashbo
 
   function addSet(weight: number, reps: number) {
     if (!selectedExercise) return;
+    activateWorkoutTimer();
     const ensured = ensureTodaySession(data);
     let workoutExercise = ensured.data.workoutExercises.find(
       (entry) => entry.workoutSessionId === ensured.session.id && entry.exerciseId === selectedExercise.id,
@@ -268,6 +412,27 @@ export function WorkoutDashboard({ data, bodyWeightKg, onChange }: WorkoutDashbo
         createdAt: new Date().toISOString(),
       }],
     });
+    const targetSets = workoutExercise.targetSets ?? Math.max(4, previousSets.length);
+    if (setCount + 1 < targetSets) startRest();
+    else stopRest();
+  }
+
+  function updateWorkoutPlan(patch: { targetSets?: number; effort?: "easy" | "normal" | "hard"; notes?: string }) {
+    if (!selectedExercise) return;
+    const ensured = ensureTodaySession(data);
+    const entry = ensured.data.workoutExercises.find(
+      (item) => item.workoutSessionId === ensured.session.id && item.exerciseId === selectedExercise.id,
+    );
+    if (entry) {
+      commit({ ...ensured.data, workoutExercises: ensured.data.workoutExercises.map((item) =>
+        item.id === entry.id ? { ...item, ...patch } : item,
+      ) });
+      return;
+    }
+    commit({ ...ensured.data, workoutExercises: [...ensured.data.workoutExercises, {
+      id: crypto.randomUUID(), workoutSessionId: ensured.session.id, exerciseId: selectedExercise.id,
+      createdAt: new Date().toISOString(), ...patch,
+    }] });
   }
 
   function updateSet(setId: string, weight: number, reps: number) {
@@ -278,7 +443,9 @@ export function WorkoutDashboard({ data, bodyWeightKg, onChange }: WorkoutDashbo
     const target = data.sets.find((set) => set.id === setId);
     if (!target) return;
     let nextData = deleteWorkoutSet(data, setId);
-    if (!nextData.sets.some((set) => set.workoutExerciseId === target.workoutExerciseId)) {
+    const entry = nextData.workoutExercises.find((item) => item.id === target.workoutExerciseId);
+    if (!nextData.sets.some((set) => set.workoutExerciseId === target.workoutExerciseId) &&
+      !entry?.targetSets && !entry?.effort && !entry?.notes) {
       nextData = deleteWorkoutExerciseCascade(nextData, target.workoutExerciseId);
     }
     commit(nextData);
@@ -325,12 +492,23 @@ export function WorkoutDashboard({ data, bodyWeightKg, onChange }: WorkoutDashbo
             {selectedExercise ? (
               <ExerciseTracker
                 exercise={selectedExercise}
+                workoutExercise={selectedWorkoutExercise}
                 currentSets={currentSets}
                 previousSets={previousSets}
                 personalBest={personalBest?.bestEstimatedSet}
                 onAddSet={addSet}
                 onUpdateSet={updateSet}
                 onDeleteSet={removeSet}
+                onUpdatePlan={updateWorkoutPlan}
+                sessionControl={<WorkoutSessionControl exerciseName={selectedExercise.name} elapsedSeconds={workoutElapsedSeconds}
+                  status={workoutStartedAt === null ? "idle" : workoutPausedAt === null ? "running" : "paused"}
+                  completedSets={currentSets.length} targetSets={Math.max(currentSets.length, selectedWorkoutExercise?.targetSets ?? Math.max(4, previousSets.length))}
+                  volume={currentSets.reduce((total, set) => total + set.weight * set.reps, 0)} onStart={startWorkout}
+                  onPause={pauseWorkout} onResume={resumeWorkout} onFinish={finishWorkout} />}
+                restTimer={<RestTimer duration={restDuration} remaining={displayedRestRemaining} active={restEndAt !== null}
+                  paused={restPausedRemaining !== null}
+                  finished={restFinished} onDurationChange={chooseRestDuration} onStart={() => startRest()}
+                  onStop={stopRest} onPause={pauseRest} onResume={resumeRest} onAddTime={addRestTime} />}
               />
             ) : (
               <div className="workout-empty-state workout-glass-panel"><span aria-hidden="true">◇</span><p>请先添加一个训练动作。</p></div>

@@ -189,6 +189,12 @@ function repairWorkoutExercises(
           workoutSessionId: candidate.workoutSessionId,
           exerciseId: candidate.exerciseId,
           createdAt: repairTimestamp(candidate.createdAt),
+          ...(typeof candidate.targetSets === "number" && Number.isInteger(candidate.targetSets) && candidate.targetSets >= 1 && candidate.targetSets <= 12
+            ? { targetSets: candidate.targetSets } : {}),
+          ...(candidate.effort === "easy" || candidate.effort === "normal" || candidate.effort === "hard"
+            ? { effort: candidate.effort } : {}),
+          ...(typeof candidate.notes === "string" && candidate.notes.trim()
+            ? { notes: candidate.notes.trim().slice(0, 240) } : {}),
         },
       ];
     }),

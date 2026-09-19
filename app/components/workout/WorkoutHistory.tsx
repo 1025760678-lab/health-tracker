@@ -160,6 +160,13 @@ export function WorkoutHistory({
                             {group.items.map(({ workoutExercise, exercise, sets: exerciseSets }) => (
                               <li key={workoutExercise.id}>
                                 <strong>{exercise.name}</strong>
+                                {(workoutExercise.targetSets || workoutExercise.effort) && (
+                                  <div className="workout-history-feedback">
+                                    {workoutExercise.targetSets && <span>{exerciseSets.length} / {Math.max(exerciseSets.length, workoutExercise.targetSets)} 组</span>}
+                                    {workoutExercise.effort && <span>{workoutExercise.effort === "easy" ? "轻松" : workoutExercise.effort === "normal" ? "正常" : "吃力"}</span>}
+                                  </div>
+                                )}
+                                {workoutExercise.notes && <p className="workout-history-note">{workoutExercise.notes}</p>}
                                 {exerciseSets.length > 0 ? (
                                   <ol aria-label={`${exercise.name} 的历史组数`}>
                                     {exerciseSets.map((set) => (

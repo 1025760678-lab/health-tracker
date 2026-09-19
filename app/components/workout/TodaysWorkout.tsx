@@ -93,6 +93,15 @@ export function TodaysWorkout({
                       <strong className="today-workout-exercise-name">{exercise.name}</strong>
                     )}
 
+                    <div className="today-workout-visual">
+                      <span>{exerciseSets.length} / {Math.max(exerciseSets.length, workoutExercise.targetSets ?? 4)} 组完成</span>
+                      <span>{exerciseSets.reduce((total, set) => total + set.weight * set.reps, 0).toLocaleString("zh-CN", { maximumFractionDigits: 1 })} kg 容量</span>
+                      {workoutExercise.effort && <span>{workoutExercise.effort === "easy" ? "轻松" : workoutExercise.effort === "normal" ? "正常" : "吃力"}</span>}
+                    </div>
+                    <div className="today-workout-dots" aria-hidden="true">
+                      {Array.from({ length: Math.max(exerciseSets.length, workoutExercise.targetSets ?? 4) }, (_, index) => <i key={index} data-done={index < exerciseSets.length} />)}
+                    </div>
+
                     {exerciseSets.length > 0 ? (
                       <ol className="today-workout-sets" aria-label={`${exercise.name} 的组数`}>
                         {exerciseSets.map((set) => (

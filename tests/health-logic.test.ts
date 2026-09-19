@@ -185,3 +185,17 @@ test("all new tracker namespaces survive a storage reload independently", () => 
   assert.deepEqual(loadWeightRecords(storage), weightRecords);
   assert.equal(values.size, 4);
 });
+
+test("workout set targets and feedback survive a storage reload", () => {
+  const { storage } = createMemoryStorage();
+  const workout = workoutFixture();
+  workout.workoutExercises[1] = {
+    ...workout.workoutExercises[1],
+    targetSets: 5,
+    effort: "hard",
+    notes: "下次减轻一点重量",
+  };
+
+  assert.equal(saveWorkoutData(workout, storage), true);
+  assert.deepEqual(loadWorkoutData(storage)?.workoutExercises[1], workout.workoutExercises[1]);
+});

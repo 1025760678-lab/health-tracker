@@ -98,8 +98,8 @@ export function AddSetForm({ defaultWeight, onAdd }: AddSetFormProps) {
       </p>
 
       <button className="add-set-button" type="submit">
-        <span aria-hidden="true">＋</span>
-        添加一组
+        <span aria-hidden="true">✓</span>
+        完成本组
       </button>
     </form>
   );

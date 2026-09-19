@@ -42,6 +42,9 @@ export interface WorkoutExercise {
   workoutSessionId: string;
   exerciseId: string;
   createdAt: string;
+  targetSets?: number;
+  effort?: "easy" | "normal" | "hard";
+  notes?: string;
 }
 
 export interface WorkoutSet {

@@ -33,9 +33,9 @@ export function SetRow({ set, onChange, onDelete }: SetRowProps) {
   }
 
   return (
-    <div className="workout-set-row">
+    <div className="workout-set-row" aria-label={`第 ${set.setNumber} 组已完成，${set.weight} 千克乘 ${set.reps} 次`}>
       <div className="set-number" aria-label={`第 ${set.setNumber} 组`}>
-        <small>SET</small>
+        <small>✓ 完成</small>
         <strong>{set.setNumber}</strong>
       </div>
 
@@ -86,6 +86,10 @@ export function SetRow({ set, onChange, onDelete }: SetRowProps) {
       >
         ×
       </button>
+      <div className="set-row-meta">
+        <span>本组容量 {(set.weight * set.reps).toLocaleString("zh-CN", { maximumFractionDigits: 1 })} kg</span>
+        <time dateTime={set.createdAt}>{new Intl.DateTimeFormat("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(set.createdAt))}</time>
+      </div>
     </div>
   );
 }
