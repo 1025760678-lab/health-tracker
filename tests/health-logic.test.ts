@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { renderToStaticMarkup } from "react-dom/server";
+import { TodayDashboard } from "../app/components/today/TodayDashboard";
 import type { NutritionData } from "../app/types/nutrition";
 import type { UserBodyProfile } from "../app/types/profile";
 import type { WorkoutData } from "../app/types/workout";
@@ -14,6 +16,7 @@ import {
   addFoodEntry,
   deleteFoodEntry,
   getDailyNutritionSummary,
+  getLocalDateKey,
   getSevenDayDateRange,
   moveFoodEntry,
   updateFoodEntry,
@@ -23,6 +26,7 @@ import {
   saveNutritionData,
 } from "../app/utils/nutritionStorage";
 import {
+  DEFAULT_BODY_PROFILE,
   loadBodyProfile,
   loadWeightRecords,
   saveBodyProfile,
@@ -38,6 +42,8 @@ import {
   loadWorkoutData,
   saveWorkoutData,
 } from "../app/utils/workoutStorage";
+import { buildTodayInsights, calculateDailyStatusScore } from "../app/utils/todayDashboard";
+import { loadDailyGoal, loadWaterRecords, saveDailyGoal, saveWaterRecords } from "../app/utils/storage";
 
 const profile: UserBodyProfile = {
   biologicalSex: "male",
@@ -173,17 +179,30 @@ test("all new tracker namespaces survive a storage reload independently", () => 
       createdAt: "2026-08-20T07:00:00.000Z",
     },
   ];
+  const waterRecords = [
+    {
+      id: "water-1",
+      amount: 350,
+      drinkType: "water" as const,
+      date: "2026-08-20",
+      timestamp: "2026-08-20T07:30:00.000Z",
+    },
+  ];
 
+  assert.equal(saveWaterRecords(waterRecords, storage), true);
+  assert.equal(saveDailyGoal(2400, storage), true);
   assert.equal(saveNutritionData(nutrition, storage), true);
   assert.equal(saveWorkoutData(workout, storage), true);
   saveBodyProfile(profile, storage);
   saveWeightRecords(weightRecords, storage);
 
+  assert.deepEqual(loadWaterRecords(storage), waterRecords);
+  assert.equal(loadDailyGoal(storage), 2400);
   assert.deepEqual(loadNutritionData(storage), nutrition);
   assert.deepEqual(loadWorkoutData(storage), workout);
   assert.deepEqual(loadBodyProfile(storage), profile);
   assert.deepEqual(loadWeightRecords(storage), weightRecords);
-  assert.equal(values.size, 4);
+  assert.equal(values.size, 6);
 });
 
 test("workout set targets and feedback survive a storage reload", () => {
@@ -198,4 +217,105 @@ test("workout set targets and feedback survive a storage reload", () => {
 
   assert.equal(saveWorkoutData(workout, storage), true);
   assert.deepEqual(loadWorkoutData(storage)?.workoutExercises[1], workout.workoutExercises[1]);
+});
+
+test("today completion score remains hidden for sparse data and deterministic when recorded", () => {
+  assert.equal(calculateDailyStatusScore({ waterPercent: 0, loggedMeals: 0, hasWorkout: false, profileComplete: false, recordedFactors: 0 }), null);
+  assert.equal(calculateDailyStatusScore({ waterPercent: 40, loggedMeals: 0, hasWorkout: false, profileComplete: false, recordedFactors: 1 }), null);
+  assert.equal(calculateDailyStatusScore({ waterPercent: 0, loggedMeals: 1, hasWorkout: false, profileComplete: false, recordedFactors: 1 }), null);
+  assert.equal(calculateDailyStatusScore({ waterPercent: 0, loggedMeals: 0, hasWorkout: true, profileComplete: false, recordedFactors: 1 }), null);
+  assert.equal(calculateDailyStatusScore({ waterPercent: 50, loggedMeals: 2, hasWorkout: true, profileComplete: true, recordedFactors: 4 }), 79);
+  assert.equal(calculateDailyStatusScore({ waterPercent: 180, loggedMeals: 5, hasWorkout: true, profileComplete: true, recordedFactors: 4 }), 100);
+});
+
+test("today insights use only recorded values and stay concise", () => {
+  assert.deepEqual(buildTodayInsights({
+    waterRemaining: 750,
+    waterTotal: 1250,
+    targetCalories: 2000,
+    caloriesConsumed: 1850,
+    firstMissingMeal: "晚餐",
+    workoutSets: 8,
+    weeklyWorkouts: 2,
+  }), ["今天还差 750 ml 达到饮水目标", "今日热量摄入接近目标", "今天已完成 8 组训练"]);
+
+  assert.deepEqual(buildTodayInsights({
+    waterRemaining: 2000,
+    waterTotal: 0,
+    targetCalories: null,
+    caloriesConsumed: 0,
+    firstMissingMeal: "早餐",
+    workoutSets: 0,
+    weeklyWorkouts: 0,
+  }), ["今天还差 2,000 ml 达到饮水目标", "今天还没有记录早餐"]);
+});
+
+function renderTodayState({
+  water = false,
+  workout = false,
+  nutrition = false,
+  complete = false,
+}: {
+  water?: boolean;
+  workout?: boolean;
+  nutrition?: boolean;
+  complete?: boolean;
+}) {
+  const today = getLocalDateKey();
+  const fixture = workoutFixture();
+  const workoutData = workout || complete
+    ? {
+        ...fixture,
+        sessions: fixture.sessions.map((session) => session.id === "today" ? { ...session, date: today } : session),
+      }
+    : { version: 1 as const, exercises: fixture.exercises, sessions: [], workoutExercises: [], sets: [] };
+  const mealTypes = complete ? (["breakfast", "lunch", "dinner"] as const) : (["breakfast"] as const);
+  const nutritionData: NutritionData = {
+    version: 1,
+    entries: nutrition || complete ? mealTypes.map((mealType, index) => ({
+      id: `meal-${index}`,
+      date: today,
+      mealType,
+      foodName: `餐食 ${index + 1}`,
+      calories: 500,
+      createdAt: `${today}T0${8 + index}:00:00.000Z`,
+    })) : [],
+  };
+
+  return renderToStaticMarkup(TodayDashboard({
+    waterRecords: water || complete ? [{ id: "water-today", amount: complete ? 2000 : 350, drinkType: "water", date: today, timestamp: `${today}T08:00:00.000Z` }] : [],
+    waterGoal: 2000,
+    workoutData,
+    nutritionData,
+    profile: complete ? profile : { ...DEFAULT_BODY_PROFILE },
+    weightRecords: complete ? [{ id: "weight-today", date: today, weightKg: 80, createdAt: `${today}T07:00:00.000Z` }] : [],
+    onNavigate() {},
+    onQuickAddWater() {},
+  }));
+}
+
+test("today dashboard renders safe empty, water-only, workout-only, nutrition-only and complete states", () => {
+  const empty = renderTodayState({});
+  assert.match(empty, /暂无数据/);
+  assert.match(empty, /待记录/);
+  assert.match(empty, /待完善/);
+  assert.doesNotMatch(empty, /估算缺口/);
+
+  const waterOnly = renderTodayState({ water: true });
+  assert.match(waterOnly, /350/);
+  assert.match(waterOnly, /1 次/);
+
+  const workoutOnly = renderTodayState({ workout: true });
+  assert.match(workoutOnly, /胸部/);
+  assert.match(workoutOnly, /2 组/);
+
+  const nutritionOnly = renderTodayState({ nutrition: true });
+  assert.match(nutritionOnly, /早餐/);
+  assert.match(nutritionOnly, /500 kcal/);
+
+  const complete = renderTodayState({ complete: true });
+  assert.match(complete, />100%</);
+  assert.match(complete, />3 \/ 3</);
+  assert.match(complete, />100</);
+  assert.match(complete, /今日记录已齐全/);
 });

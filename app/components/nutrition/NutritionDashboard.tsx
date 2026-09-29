@@ -36,6 +36,7 @@ interface NutritionDashboardProps {
   weightRecords: WeightRecord[];
   waterRecords: WaterRecord[];
   workoutData: WorkoutData;
+  initialView?: "today" | "profile";
   onDataChange: (data: NutritionData) => void;
   onProfileChange: (profile: UserBodyProfile) => void;
   onWeightRecordsChange: (records: WeightRecord[]) => void;
@@ -53,11 +54,12 @@ export function NutritionDashboard({
   weightRecords,
   waterRecords,
   workoutData,
+  initialView = "today",
   onDataChange,
   onProfileChange,
   onWeightRecordsChange,
 }: NutritionDashboardProps) {
-  const [view, setView] = useState<NutritionView>("today");
+  const [view, setView] = useState<NutritionView>(initialView);
   const today = getLocalDateKey();
   const todayEntries = getEntriesForDate(data, today);
   const todaySummary = getDailyNutritionSummary(data, today);

@@ -32,6 +32,13 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local credentials and private keys
+*.key
+*.p12
+*.pfx
+credentials*.json
+secrets*.json
+
 # vercel
 .vercel
 
@@ -39,6 +46,12 @@ yarn-error.log*
 /.wrangler/
 /outputs/
 /work/
+/output/
+/tmp/
+__pycache__/
+*.py[cod]
+/build_evidence_pdfs.py
+/build_word_versions.py
 *.tsbuildinfo
 
 # Xcode user and build data

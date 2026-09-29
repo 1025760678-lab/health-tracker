@@ -8,7 +8,7 @@ import { NutritionDashboard } from "./components/nutrition/NutritionDashboard";
 import { ProgressCard } from "./components/ProgressCard";
 import { ReminderCard } from "./components/ReminderCard";
 import { TodayWaterInsights, WaterTrend } from "./components/WaterInsights";
-import { TodayDashboard, type HealthSection } from "./components/today/TodayDashboard";
+import { TodayDashboard, type HealthSection, type TodayNavigationTarget } from "./components/today/TodayDashboard";
 import { WorkoutDashboard } from "./components/workout/WorkoutDashboard";
 import type { NutritionData } from "./types/nutrition";
 import type { UserBodyProfile, WeightRecord } from "./types/profile";
@@ -48,6 +48,7 @@ function getLocalDate(date = new Date()) {
 
 export default function Home() {
   const [activeTracker, setActiveTracker] = useState<HealthSection>("today");
+  const [nutritionInitialView, setNutritionInitialView] = useState<"today" | "profile">("today");
   const [waterView, setWaterView] = useState<"today" | "trend">("today");
   const [records, setRecords] = useState<WaterRecord[]>([]);
   const [dailyGoal, setDailyGoal] = useState(DEFAULT_DAILY_GOAL);
@@ -140,6 +141,11 @@ export default function Home() {
     setWeightRecords(savedRecords);
   }
 
+  function navigateFromToday(section: Exclude<HealthSection, "today">, target?: TodayNavigationTarget) {
+    if (section === "nutrition") setNutritionInitialView(target ?? "today");
+    setActiveTracker(section);
+  }
+
   return (
     <main className="app-canvas">
       <div className="ambient-light ambient-light-one" aria-hidden="true" />
@@ -152,7 +158,9 @@ export default function Home() {
             workoutData={workoutData}
             nutritionData={nutritionData}
             profile={bodyProfile}
-            onNavigate={setActiveTracker}
+            weightRecords={weightRecords}
+            onNavigate={navigateFromToday}
+            onQuickAddWater={() => addDrink({ amount: 250, drinkType: "water" })}
           />
         )}
 
@@ -201,6 +209,7 @@ export default function Home() {
             weightRecords={weightRecords}
             waterRecords={records}
             workoutData={workoutData}
+            initialView={nutritionInitialView}
             onDataChange={updateNutritionData}
             onProfileChange={updateBodyProfile}
             onWeightRecordsChange={updateWeightRecords}
@@ -217,7 +226,10 @@ export default function Home() {
           ["workout", "◆", "训练"],
           ["nutrition", "◒", "饮食"],
         ] as const).map(([section, icon, label]) => (
-          <button key={section} type="button" data-active={activeTracker === section} aria-current={activeTracker === section ? "page" : undefined} onClick={() => setActiveTracker(section)}>
+          <button key={section} type="button" data-active={activeTracker === section} aria-current={activeTracker === section ? "page" : undefined} onClick={() => {
+            if (section === "nutrition") setNutritionInitialView("today");
+            setActiveTracker(section);
+          }}>
             <span aria-hidden="true">{icon}</span><small>{label}</small>
           </button>
         ))}

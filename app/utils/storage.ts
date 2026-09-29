@@ -5,6 +5,18 @@ const RECORDS_KEY = "water-tracker-records";
 const GOAL_KEY = "water-tracker-daily-goal";
 const REMINDER_KEY = "water-tracker-reminder-settings";
 
+type WaterStorage = Pick<Storage, "getItem" | "setItem">;
+
+function resolveStorage(storage?: WaterStorage | null): WaterStorage | null {
+  if (storage !== undefined) return storage;
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
 export const DEFAULT_DAILY_GOAL = 2000;
 export const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
   enabled: false,
@@ -13,31 +25,51 @@ export const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
   endTime: "22:00",
 };
 
-export function loadWaterRecords(): WaterRecord[] {
+export function loadWaterRecords(storage?: WaterStorage | null): WaterRecord[] {
+  const target = resolveStorage(storage);
+  if (!target) return [];
   try {
-    const savedRecords = localStorage.getItem(RECORDS_KEY);
+    const savedRecords = target.getItem(RECORDS_KEY);
     return savedRecords ? (JSON.parse(savedRecords) as WaterRecord[]) : [];
   } catch {
     return [];
   }
 }
 
-export function saveWaterRecords(records: WaterRecord[]) {
-  localStorage.setItem(RECORDS_KEY, JSON.stringify(records));
+export function saveWaterRecords(records: WaterRecord[], storage?: WaterStorage | null) {
+  const target = resolveStorage(storage);
+  if (!target) return false;
+  try {
+    target.setItem(RECORDS_KEY, JSON.stringify(records));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-export function loadDailyGoal(): number {
-  const savedGoal = Number(localStorage.getItem(GOAL_KEY));
+export function loadDailyGoal(storage?: WaterStorage | null): number {
+  const target = resolveStorage(storage);
+  if (!target) return DEFAULT_DAILY_GOAL;
+  const savedGoal = Number(target.getItem(GOAL_KEY));
   return Number.isFinite(savedGoal) && savedGoal > 0 ? savedGoal : DEFAULT_DAILY_GOAL;
 }
 
-export function saveDailyGoal(goal: number) {
-  localStorage.setItem(GOAL_KEY, String(goal));
+export function saveDailyGoal(goal: number, storage?: WaterStorage | null) {
+  const target = resolveStorage(storage);
+  if (!target) return false;
+  try {
+    target.setItem(GOAL_KEY, String(goal));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-export function loadReminderSettings(): ReminderSettings {
+export function loadReminderSettings(storage?: WaterStorage | null): ReminderSettings {
+  const target = resolveStorage(storage);
+  if (!target) return DEFAULT_REMINDER_SETTINGS;
   try {
-    const savedSettings = localStorage.getItem(REMINDER_KEY);
+    const savedSettings = target.getItem(REMINDER_KEY);
     return savedSettings
       ? { ...DEFAULT_REMINDER_SETTINGS, ...(JSON.parse(savedSettings) as Partial<ReminderSettings>) }
       : DEFAULT_REMINDER_SETTINGS;
@@ -46,6 +78,13 @@ export function loadReminderSettings(): ReminderSettings {
   }
 }
 
-export function saveReminderSettings(settings: ReminderSettings) {
-  localStorage.setItem(REMINDER_KEY, JSON.stringify(settings));
+export function saveReminderSettings(settings: ReminderSettings, storage?: WaterStorage | null) {
+  const target = resolveStorage(storage);
+  if (!target) return false;
+  try {
+    target.setItem(REMINDER_KEY, JSON.stringify(settings));
+    return true;
+  } catch {
+    return false;
+  }
 }

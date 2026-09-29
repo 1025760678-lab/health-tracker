@@ -2479,3 +2479,556 @@
     transition: none !important;
   }
 }
+
+/* Today dashboard v2 — denser hierarchy, same health palette */
+
+.today-dashboard-v2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.78rem;
+}
+
+.today-dashboard-v2 > * {
+  grid-column: 1 / -1;
+}
+
+.today-primary-grid > .today-energy-card {
+  grid-column: auto;
+}
+
+.today-header-v2 {
+  padding-bottom: 0.2rem;
+}
+
+.today-header-v2 > div {
+  min-width: 0;
+}
+
+.today-header-v2 > div > p:not(.today-eyebrow) {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.today-daily-line {
+  display: block;
+  margin-top: 0.32rem;
+  color: var(--health-green-deep);
+  font-size: 0.75rem;
+  font-weight: 720;
+  line-height: 1.4;
+}
+
+.today-primary-grid,
+.today-support-grid,
+.today-final-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.78rem;
+}
+
+.today-v2-card {
+  min-width: 0;
+  border-radius: var(--health-radius);
+  padding: 1rem;
+  color: var(--foreground);
+  text-align: left;
+}
+
+.today-v2-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.today-v2-heading > div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.today-v2-heading small {
+  color: var(--health-green-deep);
+  font-size: 0.7rem;
+  font-weight: 820;
+  letter-spacing: 0.14em;
+}
+
+.today-v2-heading h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 780;
+  letter-spacing: -0.025em;
+}
+
+.today-v2-heading > span {
+  color: var(--subtle);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  text-align: right;
+}
+
+.today-status-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.85rem;
+}
+
+.today-status-main > strong {
+  min-width: 4.2rem;
+  color: var(--health-green-deep);
+  font-size: 2.75rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 770;
+  letter-spacing: -0.075em;
+  line-height: 1;
+}
+
+.today-status-main > strong[data-empty="true"] {
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.today-status-main > div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.today-status-main b {
+  font-size: 0.9rem;
+}
+
+.today-status-main span {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.today-status-factors,
+.today-compact-metrics,
+.today-week-totals {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.today-status-factors {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 0.85rem;
+}
+
+.today-status-factors > span,
+.today-compact-metrics > span,
+.today-week-totals > span {
+  display: grid;
+  min-width: 0;
+  gap: 0.12rem;
+  border: 1px solid var(--health-line);
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.16);
+  padding: 0.62rem;
+}
+
+.today-status-factors small,
+.today-compact-metrics small,
+.today-week-totals small {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.today-status-factors strong,
+.today-compact-metrics strong,
+.today-week-totals strong {
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.today-energy-card.today-v2-card,
+.today-meals-card.today-v2-card {
+  padding: 1rem;
+}
+
+.today-energy-primary-v2 {
+  margin-top: 0.8rem;
+}
+
+.today-intake-progress {
+  display: grid;
+  gap: 0.42rem;
+  margin-top: 0.7rem;
+}
+
+.today-intake-progress > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.today-intake-progress strong {
+  color: var(--foreground);
+  font-weight: 730;
+  text-align: right;
+}
+
+.today-intake-progress > i,
+.today-goal-list i {
+  display: block;
+  height: 0.32rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(83, 120, 109, 0.13);
+}
+
+.today-intake-progress > i > b,
+.today-goal-list i > b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--health-green);
+}
+
+.today-summary-grid-v2 {
+  gap: 0.78rem;
+}
+
+.today-summary-grid-v2 .today-summary-card {
+  min-height: 0;
+  padding: 1rem;
+}
+
+.today-compact-metrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 0.75rem;
+}
+
+.today-compact-metrics > span {
+  padding: 0.52rem;
+}
+
+.today-workout-content-v2 {
+  min-height: 4.6rem;
+  margin-top: 0.5rem;
+}
+
+.today-meal-list-v2 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 0.8rem;
+}
+
+.today-meal-list-v2 > span:nth-child(n) {
+  border-top: 0;
+}
+
+.today-meal-list-v2 > span:not(:first-child) {
+  border-left: 1px solid var(--health-line);
+}
+
+.today-meal-total-v2 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, auto));
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.today-meal-total-v2 em {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 690;
+  text-align: right;
+}
+
+.today-weekly-chart {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: end;
+  gap: 0.35rem;
+  height: 9.3rem;
+  margin-top: 0.8rem;
+  border-bottom: 1px solid var(--health-line);
+  padding: 0 0.15rem 0.45rem;
+}
+
+.today-week-column {
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  gap: 0.2rem;
+  height: 100%;
+}
+
+.today-week-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.18rem;
+  width: 100%;
+  height: 6.5rem;
+}
+
+.today-week-bars i {
+  width: min(0.5rem, 30%);
+  min-height: 0.18rem;
+  border-radius: 999px 999px 0.18rem 0.18rem;
+  transition: height 300ms ease;
+}
+
+.today-week-bars i[data-kind="water"] {
+  background: var(--aqua);
+}
+
+.today-week-bars i[data-kind="calories"] {
+  background: var(--health-warm);
+}
+
+.today-week-column > b {
+  color: var(--subtle);
+  font-size: 0.7rem;
+}
+
+.today-week-column > b[data-workout="true"] {
+  color: var(--health-violet);
+}
+
+.today-week-column > small {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.today-week-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 0.65rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.today-week-legend span {
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+}
+
+.today-week-legend i {
+  width: 0.52rem;
+  height: 0.52rem;
+  border-radius: 50%;
+  background: var(--health-violet);
+}
+
+.today-week-legend i[data-kind="water"] { background: var(--aqua); }
+.today-week-legend i[data-kind="calories"] { background: var(--health-warm); }
+
+.today-week-totals {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 0.72rem;
+}
+
+.today-insights-card ul {
+  display: grid;
+  gap: 0.48rem;
+  margin: 0.8rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.today-insights-card li {
+  display: grid;
+  grid-template-columns: 1.6rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--foreground);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.today-insights-card li span {
+  display: grid;
+  width: 1.6rem;
+  height: 1.6rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--health-green-soft);
+  color: var(--health-green-deep);
+  font-size: 0.7rem;
+  font-weight: 780;
+}
+
+.today-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+
+.today-action-grid button {
+  display: flex;
+  min-width: 0;
+  min-height: 3.1rem;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--health-line);
+  border-radius: 1rem;
+  background: var(--health-field);
+  color: var(--foreground);
+  padding: 0.62rem;
+  font-size: 0.75rem;
+  font-weight: 720;
+  text-align: left;
+}
+
+.today-action-grid button span {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 0.65rem;
+  background: var(--health-green-soft);
+  color: var(--health-green-deep);
+  font-size: 0.95rem;
+}
+
+.today-goal-list {
+  display: grid;
+  gap: 0.72rem;
+  margin-top: 0.8rem;
+}
+
+.today-goal-list > div {
+  display: grid;
+  gap: 0.34rem;
+}
+
+.today-goal-list span {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.55rem;
+  font-size: 0.75rem;
+}
+
+.today-goal-list small { color: var(--muted); }
+.today-goal-list strong { font-variant-numeric: tabular-nums; }
+
+.today-body-card {
+  display: block;
+  width: 100%;
+}
+
+.today-body-metric {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  gap: 0.2rem 0.7rem;
+  margin-top: 1.25rem;
+}
+
+.today-body-metric > span strong {
+  font-size: 2.4rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.065em;
+  line-height: 1;
+}
+
+.today-body-metric > span small,
+.today-body-metric > em,
+.today-body-metric > b small {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-style: normal;
+}
+
+.today-body-metric > b {
+  grid-column: 1 / -1;
+  margin-top: 0.45rem;
+  color: var(--health-green-deep);
+  font-size: 0.78rem;
+}
+
+.today-body-empty {
+  display: block;
+  margin-top: 1.2rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+@media (min-width: 48rem) {
+  .today-primary-grid,
+  .today-summary-grid-v2,
+  .today-support-grid,
+  .today-final-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .today-status-card,
+  .today-energy-card {
+    min-height: 16.1rem;
+  }
+
+  .today-summary-grid-v2 .today-summary-card {
+    min-height: 13rem;
+  }
+
+  .today-support-grid > *,
+  .today-final-grid > * {
+    height: 100%;
+  }
+}
+
+@media (max-width: 30rem) {
+  .today-header-v2 h1 {
+    font-size: 2.25rem;
+  }
+
+  .today-status-factors,
+  .today-action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .today-compact-metrics,
+  .today-week-totals {
+    gap: 0.35rem;
+  }
+
+  .today-compact-metrics > span,
+  .today-week-totals > span {
+    padding: 0.45rem;
+  }
+
+  .today-meal-list-v2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .today-meal-list-v2 > span:nth-child(3) {
+    border-left: 0;
+  }
+
+  .today-meal-list-v2 > span:nth-child(n + 3) {
+    border-top: 1px solid var(--health-line);
+  }
+
+  .today-meal-total-v2 {
+    grid-template-columns: 1fr;
+  }
+
+  .today-meal-total-v2 em {
+    text-align: left;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .today-status-factors > span,
+  .today-compact-metrics > span,
+  .today-week-totals > span {
+    background: rgba(140, 213, 183, 0.04);
+  }
+
+  .today-intake-progress > i,
+  .today-goal-list i {
+    background: rgba(194, 232, 216, 0.1);
+  }
+}

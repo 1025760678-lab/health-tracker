@@ -41,10 +41,11 @@ test("server-renders the complete Chinese health tracker shell", async () => {
 });
 
 test("keeps the four trackers and storage namespaces wired explicitly", async () => {
-  const [page, layout, nutritionStorage, workoutStorage, profileStorage] =
+  const [page, layout, todayDashboard, nutritionStorage, workoutStorage, profileStorage] =
     await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/components/today/TodayDashboard.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/utils/nutritionStorage.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/utils/workoutStorage.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/utils/profileStorage.ts", import.meta.url), "utf8"),
@@ -54,6 +55,12 @@ test("keeps the four trackers and storage namespaces wired explicitly", async ()
   assert.match(page, /WorkoutDashboard/);
   assert.match(page, /NutritionDashboard/);
   assert.match(page, /activeTracker === "water"/);
+  assert.match(todayDashboard, /今日状态/);
+  assert.match(todayDashboard, /本周趋势/);
+  assert.match(todayDashboard, /今日洞察/);
+  assert.match(todayDashboard, /快速记录/);
+  assert.match(todayDashboard, /onQuickAddWater/);
+  assert.match(todayDashboard, /记录体重/);
   assert.match(layout, /lang="zh-CN"/);
   assert.match(nutritionStorage, /nutritionTracker_data_v1/);
   assert.match(workoutStorage, /workoutTracker_data/);
