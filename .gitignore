@@ -43,6 +43,7 @@ secrets*.json
 .vercel
 
 /dist/
+/.output/
 /.wrangler/
 /outputs/
 /work/

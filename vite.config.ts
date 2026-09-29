@@ -1,4 +1,6 @@
 import { sites } from "@openai/sites-vite-plugin";
+import tailwindcss from "@tailwindcss/vite";
+import { nitro } from "nitro/vite";
 import vinext from "vinext";
 import { defineConfig } from "vite";
 import hostingConfig from "./.openai/hosting.json";
@@ -34,6 +36,17 @@ const localBindingConfig = {
 };
 
 export default defineConfig(async () => {
+  const isVercelBuild =
+    process.env.VERCEL === "1" || process.env.NITRO_PRESET === "vercel";
+
+  // Vercel runs the Vinext server through Nitro. Keep this isolated from the
+  // existing Cloudflare setup used by local development and Cloudflare builds.
+  if (isVercelBuild) {
+    return {
+      plugins: [tailwindcss(), vinext(), nitro()],
+    };
+  }
+
   // Keep Wrangler and Miniflare state project-local. These are non-secret tool
   // settings; application environment belongs in ignored `.env*` files.
   process.env.WRANGLER_WRITE_LOGS ??= "false";
